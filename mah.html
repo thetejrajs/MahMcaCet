@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAH MCA CET 2026 Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* NEW THEME: JNU Red & Teal (Imported from CUET Code) */
+            --primary: #be123c; 
+            --primary-dark: #881337;
+            --secondary: #0d9488; 
+            --accent: #f59e0b; 
+            
+            --bg: #fff1f2; /* Light Red/Pinkish Bg */
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(190, 18, 60, 0.1); /* Red tinted shadow */
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- Ticker --- */
+        .ticker-wrap {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 30px;
+            background: var(--primary-dark);
+            color: white;
+            font-size: 0.8rem;
+            line-height: 30px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker 25s linear infinite;
+            padding-left: 100%;
+        }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
+        /* --- Header --- */
+        .header-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 25px rgba(190, 18, 60, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content { position: relative; z-index: 2; }
+        
+        .blob { position: absolute; background: rgba(255,255,255,0.1); border-radius: 50%; animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Badge Style - Updated to Amber/Orange to match new theme */
+        .badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .theme-toggle { background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            padding: 0 20px;
+            margin-top: -30px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-val { font-size: 1.6rem; font-weight: 800; color: var(--primary); display: block; margin-bottom: 4px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+
+        /* --- Countdown --- */
+        .countdown-display { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
+        .cd-box {
+            background: rgba(255,255,255,0.15);
+            padding: 8px;
+            border-radius: 10px;
+            min-width: 55px;
+            backdrop-filter: blur(4px);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .cd-num { font-size: 1.4rem; font-weight: bold; display: block; line-height: 1; }
+        .cd-txt { font-size: 0.55rem; opacity: 0.8; margin-top: 4px; display: block; }
+
+        /* --- Syllabus --- */
+        .main-content { padding: 20px; max-width: 800px; margin: 0 auto; }
+        
+        .subject-group {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .subject-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .subject-name { font-weight: 700; font-size: 1rem; }
+        .subject-percent { font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
+
+        .topic-list { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
+        .topic-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .topic-item:last-child { border-bottom: none; }
+
+        .custom-cb {
+            width: 20px; height: 20px;
+            border: 2px solid var(--text-muted);
+            border-radius: 5px;
+            margin-right: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .cb-input { display: none; }
+        .cb-input:checked + .custom-cb { background: var(--primary); border-color: var(--primary); }
+        .cb-input:checked + .custom-cb::after { content: '✓'; color: white; font-size: 12px; }
+        .cb-input:checked ~ .topic-text { text-decoration: line-through; color: var(--text-muted); opacity: 0.6; }
+        .topic-text { font-size: 0.95rem; cursor: pointer; }
+
+        /* --- Quote --- */
+        /* Updated to match Teal/Green Secondary theme instead of the old Green */
+        .quote-box {
+            background: linear-gradient(to right, #0d9488, #115e59); 
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px;
+            text-align: center;
+            font-style: italic;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2);
+        }
+
+        /* --- WATERMARK FOOTER --- */
+        .footer-watermark {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            opacity: 0.7;
+        }
+        .wm-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .wm-icon { font-size: 0.9rem; color: var(--primary); }
+
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            🛑 NOTICE: MAH MCA CET 2026 Date: 30 March 2026 | Target: VJTI & SPIT Mumbai | Focus on Speed & Accuracy | 90 Mins, 100 Questions...
+        </div>
+    </div>
+
+    <div class="header-container">
+        <div class="blob" style="width: 100px; height: 100px; top: -20px; left: -20px;"></div>
+        <div class="blob" style="width: 60px; height: 60px; bottom: 20px; right: 10px; animation-delay: 2s;"></div>
+        
+        <div class="header-content">
+            <div class="top-nav">
+                <div class="badge">
+                    <span>🏆</span> TARGET: VJTI
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+            </div>
+            
+            <h1 id="user-name" onclick="editName()" style="margin:0; font-size: 1.8rem; cursor: pointer; display: inline-block; border-bottom: 1px dashed rgba(255,255,255,0.3);" title="Tap to change name">
+                Hello, Future VJTIan 👋
+            </h1>
+            <p style="opacity: 0.9; margin-top: 5px; font-size: 0.9rem;">Speed. Accuracy. Victory.</p>
+
+            <div class="countdown-display">
+                <div class="cd-box"><span class="cd-num" id="d">00</span><span class="cd-txt">DAYS</span></div>
+                <div class="cd-box"><span class="cd-num" id="h">00</span><span class="cd-txt">HRS</span></div>
+                <div class="cd-box"><span class="cd-num" id="m">00</span><span class="cd-txt">MIN</span></div>
+                <div class="cd-box"><span class="cd-num" id="s">00</span><span class="cd-txt">SEC</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <span class="stat-val" id="total-progress">0%</span>
+            <span class="stat-label">Syllabus Done</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" style="color: var(--secondary);">100</span>
+            <span class="stat-label">Total Qs</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" style="color: var(--accent);">130+</span>
+            <span class="stat-label">Safe Score</span>
+        </div>
+    </div>
+
+    <div class="quote-box" id="quote-display">
+        "Speed is useful only if you are running in the right direction."
+    </div>
+
+    <div class="main-content" id="syllabus-wrapper"></div>
+
+    <div class="footer-watermark">
+        <div class="wm-text">
+            <span class="wm-icon">⚡</span> 
+            Crafted & Engineered by Tejraj Shete
+            <span class="wm-icon">⚡</span>
+        </div>
+    </div>
+
+<script>
+    // MAH CET Date: 30 March 2026
+    const TARGET_DATE = new Date("March 30, 2026 09:00:00").getTime();
+    
+    // MAH CET SPECIFIC SYLLABUS (Content Unchanged, Colors adjusted to match new theme)
+    const SYLLABUS = [
+        {
+            category: "Mathematics & Statistics",
+            color: "#be123c", // Primary Red (Matches header)
+            topics: ["Coordinate Geometry", "Probability & Statistics", "Arithmetic (Ratio, %)", "Sets & Relations", "Basic Algebra", "Differential Equations", "Mensuration", "Trigonometry"]
+        },
+        {
+            category: "Logical/Abstract Reasoning",
+            color: "#f59e0b", // Accent Amber
+            topics: ["Visual Reasoning (Figures)", "Coding-Decoding", "Blood Relations", "Seating Arrangement", "Syllogism", "Series Completion", "Direction Sense", "Puzzles"]
+        },
+        {
+            category: "Computer Concepts",
+            color: "#0d9488", // Secondary Teal
+            topics: ["Computer Basics (CPU, I/O)", "Data Representation", "Binary Arithmetic", "Operating System Basics", "Truth Tables", "Internet & C Basics"]
+        },
+        {
+            category: "English Comprehension",
+            color: "#3b82f6", // Blue (Kept distinctly blue for contrast)
+            topics: ["Reading Comprehension", "Synonyms & Antonyms", "Grammar", "Sentence Correction", "One Word Substitution", "Idioms"]
+        }
+    ];
+
+    const QUOTES = [
+        "In MAH CET, Speed is everything.",
+        "Accuracy + Speed = VJTI Mumbai.",
+        "Don't get stuck on one question. Move on!",
+        "90 Minutes can change your life.",
+        "Practice like you've never won. Perform like you've never lost."
+    ];
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute("data-theme");
+        const newTheme = current === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("mahcetTheme", newTheme);
+    }
+    document.documentElement.setAttribute("data-theme", localStorage.getItem("mahcetTheme") || "light");
+
+    function editName() {
+        const name = prompt("Enter your Name (Future VJTIan):");
+        if (name && name.trim() !== "") {
+            localStorage.setItem("mahcetUser", name);
+            document.getElementById("user-name").innerHTML = `Hello, ${name} 👋`;
+        }
+    }
+
+    function initApp() {
+        // Load Name
+        const savedName = localStorage.getItem("mahcetUser");
+        if(savedName) document.getElementById("user-name").innerHTML = `Hello, ${savedName} 👋`;
+
+        const wrapper = document.getElementById('syllabus-wrapper');
+        const savedData = JSON.parse(localStorage.getItem('mahcetProgress')) || {};
+        let totalTopics = 0, completedTopics = 0;
+
+        SYLLABUS.forEach((section, sIdx) => {
+            let sectionCompleted = 0;
+            section.topics.forEach((t, tIdx) => { if(savedData[`${sIdx}_${tIdx}`]) sectionCompleted++; });
+            const sectionPercent = Math.round((sectionCompleted / section.topics.length) * 100);
+            totalTopics += section.topics.length;
+            completedTopics += sectionCompleted;
+
+            const card = document.createElement('div');
+            card.className = 'subject-group';
+            card.style.borderLeft = `4px solid ${section.color}`;
+            
+            let topicsHTML = '';
+            section.topics.forEach((topic, tIdx) => {
+                const id = `${sIdx}_${tIdx}`;
+                const checked = savedData[id] ? 'checked' : '';
+                topicsHTML += `
+                    <label class="topic-item">
+                        <input type="checkbox" class="cb-input" id="${id}" ${checked} onchange="toggleTopic('${id}')">
+                        <span class="custom-cb" style="border-color:${checked ? section.color : ''}; background:${checked ? section.color : ''}"></span>
+                        <span class="topic-text">${topic}</span>
+                    </label>`;
+            });
+
+            card.innerHTML = `
+                <div class="subject-header" onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden">
+                    <span class="subject-name" style="color: ${section.color}">${section.category}</span>
+                    <span class="subject-percent">${sectionPercent}% Done</span>
+                </div>
+                <div class="topic-list" ${sectionPercent === 100 ? 'hidden' : ''}>${topicsHTML}</div>
+            `;
+            wrapper.appendChild(card);
+        });
+
+        const globalPercent = Math.round((completedTopics / totalTopics) * 100);
+        document.getElementById('total-progress').innerText = globalPercent + "%";
+        document.getElementById('quote-display').innerText = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    }
+
+    function toggleTopic(id) {
+        const savedData = JSON.parse(localStorage.getItem('mahcetProgress')) || {};
+        const cb = document.getElementById(id);
+        if(cb.checked) savedData[id] = true; else delete savedData[id];
+        localStorage.setItem('mahcetProgress', JSON.stringify(savedData));
+        location.reload(); 
+    }
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const dist = TARGET_DATE - now;
+        if (dist > 0) {
+            document.getElementById("d").innerText = Math.floor(dist / (1000 * 60 * 60 * 24)).toString().padStart(2,'0');
+            document.getElementById("h").innerText = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2,'0');
+            document.getElementById("m").innerText = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2,'0');
+            document.getElementById("s").innerText = Math.floor((dist % (1000 * 60)) / 1000).toString().padStart(2,'0');
+        }
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+    initApp();
+</script>
+</body>
+</html>
